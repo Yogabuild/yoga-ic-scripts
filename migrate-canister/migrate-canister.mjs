@@ -28,7 +28,14 @@ const targetSubnet = args["target-subnet"];
 const preserveId   = args["preserve-id"];
 const snapshotDir  = args["snapshot-dir"];
 const skipConfirm  = args["yes"] ? "-y" : "";
-const nnsName      = args["nns-name"];
+const NNS_NAME_MAX = 24;
+const nnsNameRaw   = args["nns-name"];
+const nnsName      = nnsNameRaw && nnsNameRaw.length > NNS_NAME_MAX
+  ? nnsNameRaw.slice(0, NNS_NAME_MAX)
+  : nnsNameRaw;
+if (nnsNameRaw && nnsNameRaw.length > NNS_NAME_MAX) {
+  console.warn(`\x1b[33m⚠️  --nns-name truncated to ${NNS_NAME_MAX} characters: "${nnsName}" (was: "${nnsNameRaw}")\x1b[0m`);
+}
 const nnsIdentity  = args["nns-identity"];
 const totalSteps   = nnsName ? 8 : 7;
 

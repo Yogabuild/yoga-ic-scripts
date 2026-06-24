@@ -35,7 +35,7 @@ IC docs: [Canister migration](https://docs.internetcomputer.org/guides/canister-
 | `--yes` | — | `false` | Skip `migrate-id` confirmation prompt |
 | `--target-id` | — | auto-created | Reuse an already-created target canister |
 | `--snapshot-dir` | — | `./migration-snapshot` | Local directory for the snapshot files |
-| `--nns-name` | — | — | Name to attach to the (new) canister in NNS dapp after migration |
+| `--nns-name` | — | — | Name to attach to the (new) canister in NNS dapp after migration (max 24 characters — truncated automatically if longer) |
 | `--nns-identity` | — | — | Identity linked to your NNS account (required when `--nns-name` is set) |
 
 ---
