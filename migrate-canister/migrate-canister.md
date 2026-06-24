@@ -74,8 +74,8 @@ node migrate-canister.mjs \
 3. Stops the source canister and creates a snapshot
 4. Downloads the snapshot locally to `--snapshot-dir`
 5. Uploads and restores the snapshot on the target
-6. Copies non-default settings to the target, then starts it
-7. Copies controllers to the target
+6. Copies non-default settings to the target
+7. Copies controllers to the target, then starts it
 8. *(optional)* Attaches the canister name in NNS (`--nns-name` + `--nns-identity`)
 
 **After completion:** the source canister is still stopped. Delete it when ready:
