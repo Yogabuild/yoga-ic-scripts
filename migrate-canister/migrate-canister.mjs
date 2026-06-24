@@ -49,6 +49,11 @@ if (!canister || !targetSubnet) {
   process.exit(1);
 }
 
+// If --canister is a raw principal ID, use -n ic (no project manifest needed).
+// If it's a canister name from icp.yaml, use -e ic (requires running from project dir).
+const isRawId = /^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$/.test(canister);
+const srcNet  = isRawId ? "-n ic" : "-e ic";
+
 function run(cmd) {
   console.log(c.dim(`\n$ ${cmd}`));
   return execSync(cmd, { stdio: "pipe", encoding: "utf8" }).trim();
@@ -84,12 +89,12 @@ if (preserveId) {
 
 // ── Step 3: Stop source and create snapshot ───────────────────────────────────
 console.log(`\n${c.cyan(`[3/${totalSteps}]`)} Stopping source canister and creating snapshot...`);
-run(`icp canister stop ${canister} -e ic`);
+run(`icp canister stop ${canister} ${srcNet}`);
 
 // From this point, the source canister is stopped. Wrap everything in try/catch
 // so a failure always tells you how to recover.
 try {
-  const snapshotId = run(`icp canister snapshot create ${canister} -e ic -q`);
+  const snapshotId = run(`icp canister snapshot create ${canister} ${srcNet} -q`);
   console.log(`Snapshot ID: ${c.green(snapshotId)}`);
 
   // ── Step 4: Download snapshot ───────────────────────────────────────────────
@@ -97,7 +102,7 @@ try {
   rmSync(snapshotDir, { recursive: true, force: true });
   mkdirSync(snapshotDir, { recursive: true });
   runLive(
-    `icp canister snapshot download ${canister} ${snapshotId} -o ${snapshotDir} -e ic`
+    `icp canister snapshot download ${canister} ${snapshotId} -o ${snapshotDir} ${srcNet}`
   );
 
   // ── Step 5: Upload and restore on target ────────────────────────────────────
@@ -130,7 +135,7 @@ try {
 
   // ── Step 6: Copy settings and controllers ──────────────────────────────────
   console.log(`\n${c.cyan(`[6/${totalSteps}]`)} Fetching source canister settings...`);
-  const settingsOut = run(`icp canister settings show ${canister} -e ic`);
+  const settingsOut = run(`icp canister settings show ${canister} ${srcNet}`);
   console.log("Source settings:\n", settingsOut);
 
   // Parse non-default settings
@@ -189,12 +194,12 @@ try {
     run(`icp canister stop ${targetId} -n ic`);
 
     console.log(`\n${c.cyan('[Full migration]')} Running icp canister migrate-id...`);
-    run(`icp canister migrate-id ${canister} --replace ${targetId} -e ic ${skipConfirm}`);
+    run(`icp canister migrate-id ${canister} --replace ${targetId} ${srcNet} ${skipConfirm}`);
 
     console.log(c.bold(c.green("\n✅ Full migration complete.")));
     console.log(`   Canister ID now lives on the target subnet.`);
     console.log(`   Update .icp/data/mappings/<env>.ids.json if needed.`);
-    console.log(`   Verify settings: icp canister settings show ${c.green(canister)} -e ic`);
+    console.log(`   Verify settings: icp canister settings show ${c.green(canister)} ${srcNet}`);
   } else {
     // Snapshot transfer: start target, clean up source
     run(`icp canister start ${targetId} -n ic`);
@@ -212,7 +217,7 @@ try {
       console.log(c.yellow(`\n⚠️  --nns-name set but --nns-identity not provided. Skipping NNS attach.`));
       console.log(`   Run manually: icp canister call -n ic qoctq-giaaa-aaaaa-aaaea-cai attach_canister '(record { name = "${nnsName}"; canister_id = principal "${preserveId ? canister : targetId}"; })'`);
     } else {
-      const attachId = preserveId ? run(`icp canister id ${canister} -e ic`) : targetId;
+      const attachId = preserveId ? run(`icp canister id ${canister} ${srcNet}`) : targetId;
       console.log(`\n${c.cyan(`[8/${totalSteps}]`)} Attaching canister ${c.green(attachId)} as "${nnsName}" in NNS (via ${nnsIdentity})...`);
       const prevIdentity = run(`icp identity default`);
       try {
@@ -228,7 +233,7 @@ try {
 } catch (err) {
   console.error(c.red("\n❌ Migration failed:"), err.message ?? err);
   console.error(c.yellow(`\n⚠️  Source canister '${canister}' is stopped. Restart it with:`));
-  console.error(`   icp canister start ${canister} -e ic`);
+  console.error(`   icp canister start ${canister} ${srcNet}`);
   if (targetId) {
     const errStr = (err.message ?? err).toString();
     const isOutOfCycles = errStr.includes("IC0207") || errStr.includes("out of cycles");

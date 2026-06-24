@@ -21,7 +21,9 @@ IC docs: [Canister migration](https://docs.internetcomputer.org/guides/canister-
 
 - `icp` CLI installed and authenticated (`icp identity default` shows your identity)
 - Your identity has enough cycles to create the target canister
-- The target subnet ID (full principal, e.g. `bkfrj-6k62g-...`)
+- The target subnet ID (full principal, e.g. `4zbus-z2bmt-...`)
+
+> **Raw canister ID vs canister name:** Pass a raw principal ID (e.g. `abcde-fghij-klmno-pqrst-cai`) to run the script from any directory. Pass a project canister name (e.g. `logs`) only when running from its `icp.yaml` project root — the script automatically uses `-n ic` vs `-e ic` accordingly.
 
 ## Flags
 
@@ -63,11 +65,7 @@ See [NNS naming prerequisites](#nns-naming-prerequisites) below if you haven't s
 Paste your own command here before running — replace the canister ID and subnet ID with your actual values:
 
 ```sh
-node migrate-canister.mjs \
-  --canister my-canister \
-  --target-subnet <subnet-id> \
-  --nns-name "My Canister" \
-  --nns-identity my-nns-identity
+
 ```
 
 **What the script does (7 steps, or 8 with `--nns-name`):**
