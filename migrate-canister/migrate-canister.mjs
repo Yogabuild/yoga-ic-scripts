@@ -253,8 +253,11 @@ try {
       console.error(`   icp canister top-up ${targetId} --amount ${cyclesHint} -n ic`);
     }
     const preserveFlag = preserveId ? " --preserve-id --yes" : "";
+    const nnsFlags     = nnsName
+      ? ` --nns-name "${nnsName}"${nnsIdentity ? ` --nns-identity ${nnsIdentity}` : ""}`
+      : "";
     console.error(c.yellow("\n▶  Then resume the migration (skips canister creation):"));
-    console.error(`   node migrate-canister.mjs --canister ${canister} --target-subnet ${targetSubnet} --target-id ${targetId}${preserveFlag}`);
+    console.error(`   node migrate-canister.mjs --canister ${canister} --target-subnet ${targetSubnet} --target-id ${targetId}${preserveFlag}${nnsFlags}`);
   }
   process.exit(1);
 }
