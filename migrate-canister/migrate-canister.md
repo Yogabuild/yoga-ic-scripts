@@ -64,8 +64,10 @@ Paste your own command here before running — replace the canister ID and subne
 
 ```sh
 node migrate-canister.mjs \
-  --canister <your-canister-id-or-name> \
-  --target-subnet <full-subnet-principal>
+  --canister my-canister \
+  --target-subnet <subnet-id> \
+  --nns-name "My Canister" \
+  --nns-identity my-nns-identity
 ```
 
 **What the script does (7 steps, or 8 with `--nns-name`):**
